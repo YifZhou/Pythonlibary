@@ -9,7 +9,7 @@ from __future__ import division, absolute_import
 from __future__ import print_function
 import numpy as np
 import matplotlib.pyplot as plt
-from obsTime import obsTime
+from HST.obsTime import obsTime
 def HSTsinLC(expTime, cRate, param,
              orbits=4,
              orbitLength=96,  # min

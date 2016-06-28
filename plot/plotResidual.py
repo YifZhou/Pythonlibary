@@ -10,7 +10,8 @@ def plotResidual(xData, yData, models,
                  modelLabels=None,
                  axes=None,
                  marker='o',
-                 lw=2):
+                 lw=2,
+                 plotkw={}):
     if yNorm is None:
         yNorm = np.nanmedian(yData)
     if axes is None:
@@ -18,14 +19,16 @@ def plotResidual(xData, yData, models,
         ax = fig.add_axes((0.1, 0.3, 0.8, 0.6))
         ax_res = fig.add_axes((0.1, 0.1, 0.8, 0.2), sharex=ax)
     ax.plot(xData, 100 * (yData / yNorm - 1),
-            marker=marker, mfc='k', label='data', linestyle='')
+            marker=marker, mfc='k', label='data', linestyle='', zorder=3,
+            **plotkw)
     if modelLabels is None:
         modelLabels = ['Model {0:d}'.format(i) for i in xrange(len(models))]
     for label, model in zip(modelLabels, models):
-        l = ax.plot(xData, 100 * (model / yNorm - 1), lw=lw, label=label)
+        l = ax.plot(xData, 100 * (model / yNorm - 1), lw=lw, label=label,
+                    **plotkw)
         ax_res.plot(xData, 100 * (yData - model) / yNorm,
                     marker=marker,
-                    color=l[0].get_color(), linestyle='')
+                    color=l[0].get_color(), linestyle='', **plotkw)
     # different scale
     # ax.set_ylim(ylim)
     axy2 = ax.twinx()
@@ -43,7 +46,7 @@ def plotResidual(xData, yData, models,
     axy2.get_yticklabels()[0].set_visible(False)
     ax_res.get_yticklabels()[-1].set_visible(False)
     ax_res_y2.get_yticklabels()[-1].set_visible(False)
-    ax.legend(loc='best')
+    ax.legend(loc='lower right')
     ax_res.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     return fig, [ax, axy2, ax_res, ax_res_y2]

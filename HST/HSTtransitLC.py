@@ -10,7 +10,7 @@ from __future__ import division, absolute_import
 from __future__ import print_function
 import matplotlib.pyplot as plt
 import batman
-from obsTime import obsTime
+from HST.obsTime import obsTime
 def HSTtransitLC(expTime, cRate,
                  param,
                  orbits=4,
