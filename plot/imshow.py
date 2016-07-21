@@ -18,9 +18,9 @@ def imshow(im,
     """priorily using asinh to strech the image
     """
     if vmin is None:
-        vmin = np.percentile(im, ((1 - percentile) / 2) * 100)
+        vmin = np.nanpercentile(im, ((1 - percentile) / 2) * 100)
     if vmax is None:
-        vmax = np.percentile(im, ((1 - percentile) / 2 + percentile) * 100)
+        vmax = np.nanpercentile(im, ((1 - percentile) / 2 + percentile) * 100)
     if stretch == 'asinh':
         stretcher = visualization.AsinhStretch()
     elif stretch == 'log':
@@ -41,7 +41,7 @@ def imshow(im,
                      cmap=cmap,
                      interpolation=interpolation)
     if plotColorbar:
-        fig.colorbar(cax, spacing='uniform')
+        ax.figure.colorbar(cax, spacing='uniform')
     return cax
 
 

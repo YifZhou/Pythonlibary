@@ -16,8 +16,9 @@ def ackBar(
         tExp,  # start of the every exposure, in second
         cRates,  # count Rate
         exptime=180,  # exposure time
+        trap_pop=0,
         dTrap=[0],  # extra trapped electron added between orbits
-        lost=1-1e-16  # whether the trapped electron is lost or detected
+        lost=0  # whether the trapped electron is lost or detected
 ):
     """return count"""
     dTrap = itertools.cycle(dTrap)
@@ -25,7 +26,6 @@ def ackBar(
     nTrap = abs(nTrap)
     eta_trap = abs(eta_trap)
     tau_trap = abs(tau_trap)
-    trap_pop = 0  # intial number occupied trap
     for i in xrange(len(tExp)):
         try:
             dt = tExp[i+1] - tExp[i]
@@ -37,7 +37,6 @@ def ackBar(
         # when eta*incoming << nTrap, this is similar to previous equation
         # possible to be dectected
         out_trap1 = trap_pop * (1 - np.exp(-exptime/tau_trap))
-        lost = abs(lost) - int(abs(lost))
         obsCounts[i] = (
             incoming - in_trap1 + (1 - lost) * out_trap1)
         # electron released before next exposure
