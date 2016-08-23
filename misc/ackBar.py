@@ -79,7 +79,7 @@ if __name__ == '__main__':
                            [148, 149, 150, 151, 152, 153, 154], fnList)
     tExp = grismInfo['Time'].values
     cRates = np.ones(len(LC)) * LC.mean() * 1.002
-    obs = ackBar(100000, 0.02, 3 * 3600, tExp, cRates, exptime=expTime, lost=0,
+    obs = ackBar(500, 0.02, 3 * 3600, tExp, cRates, exptime=expTime, lost=0,
                  dTrap=2000)
     plt.close('all')
     plt.plot(tExp, LC*expTime, 'o')
