@@ -3,3 +3,4 @@
 from imshow import imshow
 from plotResidual import plotResidual
 from twoScalePlot import twoScalePlot
+from plotMCMC import plotMCMC
