@@ -15,7 +15,7 @@ def ackBar(
         tau_trap,  # trapping time scale
         tExp,  # start of the every exposure, in second
         cRates,  # count Rate
-        exptime=180,  # exposure time
+        exptime=180,  # exposure time...
         trap_pop=0,
         dTrap=[0],  # extra trapped electron added between orbits
         lost=0  # whether the trapped electron is lost or detected
@@ -46,7 +46,7 @@ def ackBar(
         if dt > 1200:  # whether next exposure is in next orbits
             # using in_trap1, because god know what happened to the detector
             # between orbits
-            trap_pop = min(trap_pop + in_trap1 - out_trap2 + next(dTrap), nTrap)
+            trap_pop = min(trap_pop + in_trap2 - out_trap2 + next(dTrap), nTrap)
         else:
             trap_pop = min(trap_pop + in_trap2 - out_trap2, nTrap)
         trap_pop = max(trap_pop, 0)

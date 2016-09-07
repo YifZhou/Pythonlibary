@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import corner
 import numpy as np
 from os import path
-plt.style.use('paper')
 """plot mcmc fit result
 """
 
@@ -45,4 +44,3 @@ def plotMCMC(chain, modelFunc, modelArgs, modelX, obsY,
         fig1.savefig(path.join(saveDIR, 'cornerPlot.png'))
         fig2.savefig(path.join(saveDIR, 'modelPlot.png'))
     return fig1, fig2
-    
