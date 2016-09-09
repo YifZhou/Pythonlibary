@@ -59,7 +59,7 @@ def ackBar(
         f_i = cRates[i]
         c1 = eta_trap * f_i / nTrap + 1 / tau_trap  # a key factor
         # number of trapped electron during one exposure
-        dE1 = (eta_trap * f_i / c1 - trap_pop)[1 - np.exp(-c1 * exptime)]
+        dE1 = (eta_trap * f_i / c1 - trap_pop) * (1 - np.exp(-c1 * exptime))
         trap_pop = trap_pop + dE1
         obsCounts[i] = f_i * exptime - dE1
         if dt < 1200:  # whether next exposure is in next orbits
@@ -94,7 +94,7 @@ if __name__ == '__main__':
 
     info = pd.read_csv(
         '/Users/ZhouYf/Documents/HST14241/alldata/2M0335/2M0335_fileInfo.csv',
-        parse_dates='Datetime',
+        parse_dates=True,
         index_col='Datetime')
     info['Time'] = np.float32(info.index - info.index.values[0]) / 1e9
     expTime = info['Exp Time'].values[0]
@@ -103,11 +103,12 @@ if __name__ == '__main__':
     LC, Npix = pmExtractor([60, 200],
                            [148, 149, 150, 151, 152, 153, 154], fnList)
     tExp = grismInfo['Time'].values
-    cRates = np.ones(len(LC)) * LC.mean() * 1.002
-    obs = ackBar(500, 0.02, 3 * 3600, tExp, cRates, exptime=expTime, lost=0,
-                 dTrap=2000)
+    # cRates = np.ones(len(LC)) * LC.mean() * 1.002
+    cRates = np.ones(len(LC)) * 20
+    obs = ackBar(2000, 0.02, 3 * 3600, tExp, cRates, exptime=expTime, lost=0,
+                 dTrap=[0], mode='scanning')
     plt.close('all')
-    plt.plot(tExp, LC*expTime, 'o')
+    # plt.plot(tExp, LC*expTime, 'o')
     plt.plot(tExp, obs, '-')
     # plt.ylim([crate * 0.95, crate * 1.02])
     plt.show()
