@@ -4,23 +4,48 @@ import numpy as np
 import matplotlib.pyplot as plt
 import itertools
 """ramp effect model
+
 author: Daniel Apai
-Adapted to python by Yifan Zhou
+
+Version 0.2: add extra keyword parameter to indicate scan or staring
+mode observations for staring mode, the detector receive flux in the
+same rate during overhead time as that during exposure
+precise mathematics forms are included
+
+Version 0.1: Adapted original IDL code to python by Yifan Zhou
+
 """
 
 
 def ackBar(
-        nTrap,  # number of electron traps
-        eta_trap,  # trapping efficiency
-        tau_trap,  # trapping time scale
-        tExp,  # start of the every exposure, in second
-        cRates,  # count Rate
-        exptime=180,  # exposure time...
+        nTrap,
+        eta_trap,
+        tau_trap,
+        tExp,
+        cRates,
+        exptime=180,
         trap_pop=0,
-        dTrap=[0],  # extra trapped electron added between orbits
-        lost=0  # whether the trapped electron is lost or detected
+        dTrap=[0],
+        lost=0,
+        mode='scanning'
 ):
-    """return count"""
+    """Hubble Space Telescope ramp effet model
+
+    Parameters:
+
+    nTrap -- Number of traps in one pixel
+    eta_trap -- Trapping efficiency
+    tau_trap -- Trap life time
+    tExp -- start time of every exposures
+    cRate -- intrinsic count rate of each exposures
+    expTime -- (default 180 seconds) exposure time of the time series
+    trap_pop -- (default 0) number of occupied traps at the beginning of the observations
+    dTrap -- (default [0])number of extra trap added in the gap between two orbits
+    lost -- (default 0, no lost) proportion of trapped electrons that are not eventually detected
+    (mode) -- (default scanning, scanning or staring), for scanning mode
+    observation , the pixel no longer receive photons during the overhead
+    time, in staring mode, the pixel keps receiving elctrons
+    """
     dTrap = itertools.cycle(dTrap)
     obsCounts = np.zeros(len(tExp))
     nTrap = abs(nTrap)
@@ -31,24 +56,24 @@ def ackBar(
             dt = tExp[i+1] - tExp[i]
         except IndexError:
             dt = exptime
-        effective_cRate = cRates[i]
-        incoming = exptime * effective_cRate
-        in_trap1 = (nTrap - trap_pop) * (1 - np.exp(-eta_trap*incoming/nTrap))
-        # when eta*incoming << nTrap, this is similar to previous equation
-        # possible to be dectected
-        out_trap1 = trap_pop * (1 - np.exp(-exptime/tau_trap))
-        obsCounts[i] = (
-            incoming - in_trap1 + (1 - lost) * out_trap1)
-        # electron released before next exposure
-        in_trap2 = (nTrap - trap_pop) *\
-                   (1 - np.exp(-eta_trap*dt*effective_cRate/nTrap))
-        out_trap2 = trap_pop * (1 - np.exp(-dt/tau_trap))
-        if dt > 1200:  # whether next exposure is in next orbits
-            # using in_trap1, because god know what happened to the detector
-            # between orbits
-            trap_pop = min(trap_pop + in_trap2 - out_trap2 + next(dTrap), nTrap)
+        f_i = cRates[i]
+        c1 = eta_trap * f_i / nTrap + 1 / tau_trap  # a key factor
+        # number of trapped electron during one exposure
+        dE1 = (eta_trap * f_i / c1 - trap_pop)[1 - np.exp(-c1 * exptime)]
+        trap_pop = trap_pop + dE1
+        obsCounts[i] = f_i * exptime - dE1
+        if dt < 1200:  # whether next exposure is in next orbits
+            # same orbits
+            if mode == 'scanning':
+                # scanning mode, no incoming flux between orbits
+                dE2 = - trap_pop * (1 - np.exp(-(dt - exptime)/tau_trap))
+            else:
+                # else there is incoming flux
+                dE2 = (eta_trap * f_i / c1 - trap_pop)[1 - np.exp(-c1 * (dt - exptime))]
+            trap_pop = min(trap_pop + dE2, nTrap)
         else:
-            trap_pop = min(trap_pop + in_trap2 - out_trap2, nTrap)
+            # next orbits
+            trap_pop = min(trap_pop * np.exp(-(dt-exptime)/tau_trap) + next(dTrap), nTrap)
         trap_pop = max(trap_pop, 0)
         # out_trap = max(-(trap_pop * (1 - np.exp(exptime / tau_trap))), 0)
         # out_trap = trap_pop / tau_trap * dt * np.exp(-dt / tau_trap)
