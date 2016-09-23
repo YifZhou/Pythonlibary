@@ -4,8 +4,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import itertools
 """ramp effect model
+2 means two types of traps
 
-author: Daniel Apai
+original author: Daniel Apai
+
+Version 0.2.1 introduce two types of traps, slow traps and fast traps
 
 Version 0.2: add extra keyword parameter to indicate scan or staring
 mode observations for staring mode, the detector receive flux in the
@@ -17,15 +20,19 @@ Version 0.1: Adapted original IDL code to python by Yifan Zhou
 """
 
 
-def ackBar(
-        nTrap,
-        eta_trap,
-        tau_trap,
+def ackBar2(
+        nTrap_s,
+        eta_trap_s,
+        tau_trap_s,
+        nTrap_f,
+        eta_trap_f,
+        tau_trap_f,
         tExp,
         cRates,
         exptime=180,
-        trap_pop=0,
-        dTrap=[0],
+        trap_pop_s=0,
+        trap_pop_f=0,
+        dTrap_f=[0],
         lost=0,
         mode='scanning'
 ):
@@ -33,9 +40,12 @@ def ackBar(
 
     Parameters:
 
-    nTrap -- Number of traps in one pixel
-    eta_trap -- Trapping efficiency
-    tau_trap -- Trap life time
+    nTrap_s -- Number of slow traps in one pixel
+    eta_trap_s -- Trapping efficiency for slow traps
+    tau_trap_s -- Trap life time of slow trap
+    nTrap_f -- Number of fast traps in one pixel
+    eta_trap_f -- Trapping efficiency for fast traps
+    tau_trap_f -- Trap life time of fast trap
     tExp -- start time of every exposures
     cRate -- intrinsic count rate of each exposures
     expTime -- (default 180 seconds) exposure time of the time series
@@ -46,43 +56,55 @@ def ackBar(
       observation , the pixel no longer receive photons during the overhead
       time, in staring mode, the pixel keps receiving elctrons
     """
-    dTrap = itertools.cycle(dTrap)
+    dTrap_f = itertools.cycle(dTrap_f)
     obsCounts = np.zeros(len(tExp))
-    nTrap = abs(nTrap)
-    eta_trap = abs(eta_trap)
-    tau_trap = abs(tau_trap)
+    nTrap_s = abs(nTrap_s)
+    eta_trap_s = abs(eta_trap_s)
+    tau_trap_s = abs(tau_trap_s)
+    nTrap_f = abs(nTrap_f)
+    eta_trap_f = abs(eta_trap_f)
+    tau_trap_f = abs(tau_trap_f)
+    trap_pop_s = min(trap_pop_s, nTrap_s)
+    trap_pop_f = min(trap_pop_f, nTrap_f)
     for i in xrange(len(tExp)):
         try:
             dt = tExp[i+1] - tExp[i]
         except IndexError:
             dt = exptime
         f_i = cRates[i]
-        c1 = eta_trap * f_i / nTrap + 1 / tau_trap  # a key factor
+        c1_s = eta_trap_s * f_i / nTrap_s + 1 / tau_trap_s  # a key factor
+        c1_f = eta_trap_f * f_i / nTrap_f + 1 / tau_trap_f
         # number of trapped electron during one exposure
-        dE1 = (eta_trap * f_i / c1 - trap_pop) * (1 - np.exp(-c1 * exptime))
-        trap_pop = trap_pop + dE1
-        obsCounts[i] = f_i * exptime - dE1
+        dE1_s = (eta_trap_s * f_i / c1_s - trap_pop_s) * (1 - np.exp(-c1_s * exptime))
+        dE1_f = (eta_trap_f * f_i / c1_f - trap_pop_f) * (1 - np.exp(-c1_f * exptime))
+        trap_pop_s = trap_pop_s + dE1_s
+        trap_pop_f = trap_pop_f + dE1_f
+        obsCounts[i] = f_i * exptime - dE1_s - dE1_f
         if dt < 5 * exptime:  # whether next exposure is in next batch of exposures
             # same orbits
             if mode == 'scanning':
                 # scanning mode, no incoming flux between orbits
-                dE2 = - trap_pop * (1 - np.exp(-(dt - exptime)/tau_trap))
+                dE2_s = - trap_pop_s * (1 - np.exp(-(dt - exptime)/tau_trap_s))
+                dE2_f = - trap_pop_f * (1 - np.exp(-(dt - exptime)/tau_trap_f))
             elif mode == 'staring':
                 # else there is incoming flux
-                dE2 = (eta_trap * f_i / c1 - trap_pop) * (1 - np.exp(-c1 * (dt - exptime)))
+                dE2_s = (eta_trap_s * f_i / c1_s - trap_pop_s) * (1 - np.exp(-c1_s * (dt - exptime)))
+                dE2_f = (eta_trap_f * f_i / c1_f - trap_pop_f) * (1 - np.exp(-c1_f * (dt - exptime)))
             else:
                 # others, same as scanning
-                dE2 = - trap_pop * (1 - np.exp(-(dt - exptime)/tau_trap))
-            trap_pop = min(trap_pop + dE2, nTrap)
+                dE2_s = - trap_pop_s * (1 - np.exp(-(dt - exptime)/tau_trap_s))
+                dE2_f = - trap_pop_f * (1 - np.exp(-(dt - exptime)/tau_trap_f))
+            trap_pop_s = min(trap_pop_s + dE2_s, nTrap_s)
+            trap_pop_f = min(trap_pop_f + dE2_f, nTrap_f)
         elif dt < 1200:
-            # next exposure gap
-            trap_pop = min(trap_pop * np.exp(-(dt-exptime)/tau_trap), nTrap)
+            # next batch
+            trap_pop_s = min(trap_pop_s * np.exp(-(dt-exptime)/tau_trap_s), nTrap_s)
+            trap_pop_f = min(trap_pop_f * np.exp(-(dt-exptime)/tau_trap_f), nTrap_f)
         else:
-            # next orbits
-            trap_pop = min(trap_pop * np.exp(-(dt-exptime)/tau_trap) + next(dTrap), nTrap)
-        trap_pop = max(trap_pop, 0)
-        # out_trap = max(-(trap_pop * (1 - np.exp(exptime / tau_trap))), 0)
-        # out_trap = trap_pop / tau_trap * dt * np.exp(-dt / tau_trap)
+            trap_pop_s = min(trap_pop_s * np.exp(-(dt-exptime)/tau_trap_s), nTrap_s)
+            trap_pop_f = min(trap_pop_f * np.exp(-(dt-exptime)/tau_trap_f) + next(dTrap_f), nTrap_f)
+        trap_pop_s = max(trap_pop_s, 0)
+        trap_pop_f = max(trap_pop_f, 0)
 
     return obsCounts
 
@@ -106,14 +128,13 @@ if __name__ == '__main__':
     grismInfo = info[info['Filter'] == 'G141']
     tExp = grismInfo['Time'].values
     # cRates = np.ones(len(LC)) * LC.mean() * 1.002
-    cRates = np.ones(len(tExp)) * 80
-    obs = ackBar(1200, 0.02, 5000, tExp, cRates, exptime=expTime, lost=0,
-                 dTrap=[200], mode='scanning')
-    obs2 = ackBar(1200, 0.02, 5000, tExp, cRates, exptime=expTime, lost=0,
-                 dTrap=[200], mode='staring')
+    cRates = np.ones(len(tExp)) * 100
+    obs = ackBar2(500, 0.01, 5000,
+                  500, 0.005, 20,
+                  tExp, cRates, exptime=expTime, lost=0,
+                  mode='scanning')
     plt.close('all')
     # plt.plot(tExp, LC*expTime, 'o')
     plt.plot(tExp, obs, '-')
-    plt.plot(tExp, obs2, '-')
     # plt.ylim([crate * 0.95, crate * 1.02])
     plt.show()

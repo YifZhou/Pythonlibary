@@ -46,7 +46,7 @@ def plotResidual(xData, yData, models,
     axy2.get_yticklabels()[0].set_visible(False)
     ax_res.get_yticklabels()[-1].set_visible(False)
     ax_res_y2.get_yticklabels()[-1].set_visible(False)
-    ax.legend(loc='lower right')
+    ax.legend(loc='best')
     ax_res.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     return fig, [ax, axy2, ax_res, ax_res_y2]
