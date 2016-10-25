@@ -5,6 +5,8 @@ from astropy import visualization
 from astropy.visualization.mpl_normalize import ImageNormalize
 
 __all__ = ['imshow']
+
+
 def imshow(im,
            vmin=None,
            vmax=None,

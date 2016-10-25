@@ -44,6 +44,8 @@ class scanFile(object):
         self.rootName = imaHeader['ROOTNAME']
         self.nSamp = imaHeader['NSAMP']
         self.expTime = imaHeader['EXPTIME']
+        ima1Header = fits.getheader(self.imaFN, 'sci', 1)
+        self.unit = ima1Header['BUNIT']
         # unit: counts, specifically for scanning data file
         self.imaDataCube = np.zeros((arraySize, arraySize, self.nSamp))
         self.imaSampTime = np.zeros(self.nSamp)
@@ -62,6 +64,10 @@ class scanFile(object):
                                                  5:5+self.arraySize] * self.dqMask
                 self.imaSampTime[i] = f['sci', self.nSamp - i].header[
                     'SAMPTIME']
+                if self.unit == 'ELECTRONS/S':
+                    self.imaDataCube[:, :, i] = self.imaDataCube[:, :, i] * self.imaSampTime[i]
+                if i > 0:
+                    self.imaDataCube[:, :, i] = self.imaDataCube[:, :, i] + self.imaDataCube[:, :, 0]
             for i in xrange(self.nSamp - 1):
                 self.imaDataDiff[:, :, i] =\
                     self.imaDataCube[:, :, i+1] - self.imaDataCube[:, :, i]
