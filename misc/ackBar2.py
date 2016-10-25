@@ -1,4 +1,4 @@
-# ! /usr/bin/env python
+ # ! /usr/bin/env python
 from __future__ import print_function, division
 import numpy as np
 import matplotlib.pyplot as plt
@@ -59,6 +59,7 @@ def ackBar2(
     """
     dTrap_s = itertools.cycle(dTrap_s)
     dTrap_f = itertools.cycle(dTrap_f)
+    dTrap_s = itertools.cycle(dTrap_s)
     obsCounts = np.zeros(len(tExp))
     nTrap_s = abs(nTrap_s)
     eta_trap_s = abs(eta_trap_s)
@@ -79,8 +80,10 @@ def ackBar2(
         # number of trapped electron during one exposure
         dE1_s = (eta_trap_s * f_i / c1_s - trap_pop_s) * (1 - np.exp(-c1_s * exptime))
         dE1_f = (eta_trap_f * f_i / c1_f - trap_pop_f) * (1 - np.exp(-c1_f * exptime))
-        trap_pop_s = trap_pop_s + dE1_s
-        trap_pop_f = trap_pop_f + dE1_f
+        dE1_s = min(trap_pop_s + dE1_s, dTrap_s) - trap_pop_s
+        dE1_f = min(trap_pop_f + dE1_f, dTrap_f) - trap_pop_f
+        trap_pop_s = min(trap_pop_s + dE1_s, dTrap_s)
+        trap_pop_f = min(trap_pop_f + dE1_f, dTrap_f)
         obsCounts[i] = f_i * exptime - dE1_s - dE1_f
         if dt < 5 * exptime:  # whether next exposure is in next batch of exposures
             # same orbits
