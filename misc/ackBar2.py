@@ -33,6 +33,7 @@ def ackBar2(
         trap_pop_s=0,
         trap_pop_f=0,
         dTrap_f=[0],
+        dTrap_s=[0],
         lost=0,
         mode='scanning'
 ):
@@ -56,6 +57,7 @@ def ackBar2(
       observation , the pixel no longer receive photons during the overhead
       time, in staring mode, the pixel keps receiving elctrons
     """
+    dTrap_s = itertools.cycle(dTrap_s)
     dTrap_f = itertools.cycle(dTrap_f)
     obsCounts = np.zeros(len(tExp))
     nTrap_s = abs(nTrap_s)
@@ -101,7 +103,7 @@ def ackBar2(
             trap_pop_s = min(trap_pop_s * np.exp(-(dt-exptime)/tau_trap_s), nTrap_s)
             trap_pop_f = min(trap_pop_f * np.exp(-(dt-exptime)/tau_trap_f), nTrap_f)
         else:
-            trap_pop_s = min(trap_pop_s * np.exp(-(dt-exptime)/tau_trap_s), nTrap_s)
+            trap_pop_s = min(trap_pop_s * np.exp(-(dt-exptime)/tau_trap_s) + next(dTrap_s), nTrap_s)
             trap_pop_f = min(trap_pop_f * np.exp(-(dt-exptime)/tau_trap_f) + next(dTrap_f), nTrap_f)
         trap_pop_s = max(trap_pop_s, 0)
         trap_pop_f = max(trap_pop_f, 0)

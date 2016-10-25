@@ -38,10 +38,10 @@ def plotResidual(xData, yData, models,
     ax_res.set_ylim([-yThresh*100, yThresh*100])
     ax_res_y2.set_ylim(np.array(ax_res.get_ylim()) / 100 * yNorm)
     ax_res_y2.set_yticks((ax_res.get_yticks() / 100) * yNorm)
-    for xlabel in ax.get_xticklabels():
-        xlabel.set_visible(False)
-    for xlabel in axy2.get_xticklabels():
-        xlabel.set_visible(False)
+    for xticklabel in ax.get_xticklabels():
+        xticklabel.set_visible(False)
+    for xticklabel in axy2.get_xticklabels():
+        xticklabel.set_visible(False)
     ax.get_yticklabels()[0].set_visible(False)
     axy2.get_yticklabels()[0].set_visible(False)
     ax_res.get_yticklabels()[-1].set_visible(False)
