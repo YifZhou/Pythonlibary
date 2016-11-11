@@ -82,8 +82,8 @@ def ackBar2(
         dE1_f = (eta_trap_f * f_i / c1_f - trap_pop_f) * (1 - np.exp(-c1_f * exptime))
         dE1_s = min(trap_pop_s + dE1_s, dTrap_s) - trap_pop_s
         dE1_f = min(trap_pop_f + dE1_f, dTrap_f) - trap_pop_f
-        trap_pop_s = min(trap_pop_s + dE1_s, dTrap_s)
-        trap_pop_f = min(trap_pop_f + dE1_f, dTrap_f)
+        trap_pop_s = min(trap_pop_s + dE1_s, nTrap_s)
+        trap_pop_f = min(trap_pop_f + dE1_f, nTrap_f)
         obsCounts[i] = f_i * exptime - dE1_s - dE1_f
         if dt < 5 * exptime:  # whether next exposure is in next batch of exposures
             # same orbits

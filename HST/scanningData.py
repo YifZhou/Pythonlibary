@@ -32,12 +32,14 @@ class scanFile(object):
                  saveDIR,
                  dqMask,
                  skyMask,
+                 removeSky=True,
                  arraySize=256):
         super(scanFile, self).__init__()
         self.dqMask = dqMask
         self.skyMask = skyMask
         self.fileDIR = fileDIR
         self.saveDIR = saveDIR
+        self.removeSky = removeSky
         self.arraySize = arraySize
         self.imaFN = path.join(fileDIR, fileName)
         imaHeader = fits.getheader(self.imaFN, 0)
@@ -71,7 +73,8 @@ class scanFile(object):
             for i in xrange(self.nSamp - 1):
                 self.imaDataDiff[:, :, i] =\
                     self.imaDataCube[:, :, i+1] - self.imaDataCube[:, :, i]
-            self.removeSky()
+            if self.removeSky:
+                self.removeSky()
 
     def removeSky(self, klipthresh=2):
         self.skyValue = np.ones(self.nSamp - 1)
