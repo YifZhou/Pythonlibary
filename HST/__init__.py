@@ -9,3 +9,4 @@ from telescopeRoll import telescopeRoll
 from dqMask import dqMask
 from scanningData import scanFile, scanData
 from scanMask import makeMask
+from WFC3GrismFlat import calFlat
