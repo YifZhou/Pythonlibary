@@ -1,4 +1,4 @@
- # ! /usr/bin/env python
+# ! /usr/bin/env python
 from __future__ import print_function, division
 import numpy as np
 import matplotlib.pyplot as plt
@@ -48,7 +48,7 @@ def ackBar2(
     eta_trap_f -- Trapping efficiency for fast traps
     tau_trap_f -- Trap life time of fast trap
     tExp -- start time of every exposures
-    cRate -- intrinsic count rate of each exposures
+    cRate -- intrinsic count rate of each exposures, unit e/s
     expTime -- (default 180 seconds) exposure time of the time series
     trap_pop -- (default 0) number of occupied traps at the beginning of the observations
     dTrap -- (default [0])number of extra trap added in the gap between two orbits
@@ -57,7 +57,6 @@ def ackBar2(
       observation , the pixel no longer receive photons during the overhead
       time, in staring mode, the pixel keps receiving elctrons
     """
-    dTrap_s = itertools.cycle(dTrap_s)
     dTrap_f = itertools.cycle(dTrap_f)
     dTrap_s = itertools.cycle(dTrap_s)
     obsCounts = np.zeros(len(tExp))
@@ -80,8 +79,8 @@ def ackBar2(
         # number of trapped electron during one exposure
         dE1_s = (eta_trap_s * f_i / c1_s - trap_pop_s) * (1 - np.exp(-c1_s * exptime))
         dE1_f = (eta_trap_f * f_i / c1_f - trap_pop_f) * (1 - np.exp(-c1_f * exptime))
-        dE1_s = min(trap_pop_s + dE1_s, dTrap_s) - trap_pop_s
-        dE1_f = min(trap_pop_f + dE1_f, dTrap_f) - trap_pop_f
+        dE1_s = min(trap_pop_s + dE1_s, nTrap_s) - trap_pop_s
+        dE1_f = min(trap_pop_f + dE1_f, nTrap_f) - trap_pop_f
         trap_pop_s = min(trap_pop_s + dE1_s, nTrap_s)
         trap_pop_f = min(trap_pop_f + dE1_f, nTrap_f)
         obsCounts[i] = f_i * exptime - dE1_s - dE1_f
