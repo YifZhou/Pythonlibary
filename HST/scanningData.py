@@ -66,7 +66,7 @@ class scanFile(object):
         self.scanLength = None
         self.scanStart = None
         self.readIma()
-        self.calScanLength()
+        # self.calScanLength()
 
     def readIma(self):
         with fits.open(self.imaFN) as f:
@@ -275,6 +275,7 @@ class scanData(object):
                  skyFN,
                  flatFN,
                  ROI,
+                 arraySize=256,
                  restore=False,
                  twoDirect=False,
                  restoreDIR=None):
@@ -289,6 +290,7 @@ class scanData(object):
         # self.skyMask = np.full(self.dqMask.shape, np.nan)
         # self.skyMask[ROI[2]:ROI[3], 10:35] = 1
         # self.skyMask = self.skyMask * self.dqMask
+        self.arraySize = arraySize
         self.ROI = ROI
         self.scanFileList = []
         self.saveDIR = saveDIR
@@ -311,7 +313,7 @@ class scanData(object):
             for i, fn in enumerate(self.info['File Name']):
                 self.scanFileList.append(
                     scanFile(fn, fileDIR, saveDIR, self.dqMask, self.skyMask, self.flat,
-                             self.ROI, arraySize=512,
+                             self.ROI, arraySize=self.arraySize,
                              scanDirect=self.scanDirect[i]))
 
     def showExampleImage(self, n=0):
@@ -429,7 +431,7 @@ class scanData(object):
     def calcTwoDirectScale(self, yRange=None, nStart=3):
         wlc, wlc_err = self.whiteLC(yRange=yRange)
         scanCorrFactList = np.zeros(2)
-        for i, orbit in enumerate((1, 3)):
+        for i, orbit in enumerate((0, 1)):
             # remove first several exposures affected by ramp effect
             lc_upp = wlc[(self.orbit == orbit) & (self.scanDirect == 0)]
             lc_down = wlc[(self.orbit == orbit) & (self.scanDirect == 1)]
@@ -439,7 +441,7 @@ class scanData(object):
     def plotScanLength(self, iLevel=3):
         scanLength = []
         scanStart = []
-        for sf in sd.scanFileList:
+        for sf in self.scanFileList:
             scanLength.append(sf.scanLength[iLevel])
             if sf.scanDirect == 0:
                 scanStart.append(sf.scanStart[iLevel])
@@ -456,6 +458,7 @@ class scanData(object):
 
 
 if __name__ == '__main__':
+    pass
     # visits = range(1, 16)
     # visits = range(1, 16)
     # xStarts = np.array([65, 70, 65, 65, 65, 70, 70, 70, 70, 70, 70, 70, 70, 70,
