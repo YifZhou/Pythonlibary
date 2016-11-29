@@ -105,9 +105,9 @@ def ackBar2(
                 # next batch
                 trap_pop_s = min(trap_pop_s * np.exp(-(dt-exptime)/tau_trap_s), nTrap_s)
                 trap_pop_f = min(trap_pop_f * np.exp(-(dt-exptime)/tau_trap_f), nTrap_f)
-            else:
-                trap_pop_s = min(trap_pop_s + dE2_s, nTrap_s)
-                trap_pop_f = min(trap_pop_f + dE2_f, nTrap_f)
+            # else:
+            #     trap_pop_s = min(trap_pop_s + dE2_s, nTrap_s)
+            #     trap_pop_f = min(trap_pop_f + dE2_f, nTrap_f)
         else:
             trap_pop_s = min(trap_pop_s * np.exp(-(dt-exptime)/tau_trap_s) + next(dTrap_s), nTrap_s)
             trap_pop_f = min(trap_pop_f * np.exp(-(dt-exptime)/tau_trap_f) + next(dTrap_f), nTrap_f)

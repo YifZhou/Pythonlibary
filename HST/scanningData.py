@@ -456,6 +456,7 @@ class scanData(object):
 
 
 if __name__ == '__main__':
+    pass
     # visits = range(1, 16)
     # visits = range(1, 16)
     # xStarts = np.array([65, 70, 65, 65, 65, 70, 70, 70, 70, 70, 70, 70, 70, 70,
