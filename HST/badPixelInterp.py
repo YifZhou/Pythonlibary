@@ -7,6 +7,7 @@ import numpy as np
 from scipy.interpolate import griddata
 # from scipy.interpolate import SmoothBivariateSpline
 
+
 def badPixelInterp(im, mask):
     """im -- image to be interpolated
        mask -- mask out the bad pixels, bad pixel should be masked with np.nan
