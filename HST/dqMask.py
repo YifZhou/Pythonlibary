@@ -1,11 +1,10 @@
 #! /usr/bin/env python
-
+from __future__ import absolute_import
 import numpy as np
 
-u"""flag the bad pixel and create mask for the bad pixels
+"""flag the bad pixel and create mask for the bad pixels
 """
 
-from __future__ import absolute_import
 flag_dict = {
     0: u'OK',
     1: u'decoding error',
