@@ -25,7 +25,7 @@ flag_dict = {
 
 
 def dqMask(dq, flagList=[4, 16, 32, 256]):
-    u"""identify certain flagged pixels as bad pixels, and create mask
+    """identify certain flagged pixels as bad pixels, and create mask
     Return
       mask -- bool array, masked pixel marked as True
     Parameters:
