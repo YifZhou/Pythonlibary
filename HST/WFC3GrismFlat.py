@@ -61,26 +61,6 @@ def calFlat(xc, yc, outSize=256):
     else:
         return flat[margin:-margin, margin:-margin]
 
-# def calFlat(x0, arraySize=256):
-#     """calcualte the wavelength dependent flat field
-#     """
-#     flatCube = getFlatCube(arraySize)
-#     lambda_min = 10600
-#     lambda_max = 17000
-#     lambdaList = xtowl(np.arange(arraySize) - x0)
-#     # import ipdb;
-#     # ipdb.set_trace()
-#     flat = flatCube[:, :, 0].copy()
-#     l = (lambdaList - lambda_min) / (lambda_max - lambda_min)
-#     for i in range(arraySize):
-#         flat[i, :] = flat[i, :] + flatCube[i, :, 1] * l +\
-#                      flatCube[i, :, 2]*l**2 + flatCube[i, :, 3]*l**3
-#     return flat
-
-# x0List = [19.915, 23.95, 20.06, 20.16, 20.06, 21.91, 21.94, 23.26, 23.94,
-#           21.73, 21.73, 21.73, 21.16, 24.11,
-#           24.16]  # x coord of the direct image
-
 
 if __name__ == '__main__':
     x0 = 20
