@@ -1,11 +1,10 @@
 #! /usr/bin/env python
-
+from __future__ import absolute_import
 import numpy as np
 
-u"""flag the bad pixel and create mask for the bad pixels
+"""flag the bad pixel and create mask for the bad pixels
 """
 
-from __future__ import absolute_import
 flag_dict = {
     0: u'OK',
     1: u'decoding error',
@@ -26,7 +25,7 @@ flag_dict = {
 
 
 def dqMask(dq, flagList=[4, 16, 32, 256]):
-    u"""identify certain flagged pixels as bad pixels, and create mask
+    """identify certain flagged pixels as bad pixels, and create mask
     Return
       mask -- bool array, masked pixel marked as True
     Parameters:

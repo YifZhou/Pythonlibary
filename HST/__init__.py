@@ -12,3 +12,4 @@ from scanMask import makeMask
 from WFC3GrismFlat import calFlat
 from badPixelInterp import badPixelInterp
 from inpaint_array import inpaint_array
+from G141SkyCube import G141SkyCube
